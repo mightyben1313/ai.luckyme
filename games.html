@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Select Game</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<header>
+    <div style="background-color: #0000ft; padding: 20px; max-width: 400px; border-radius: 8px; box-shadow: 0 0 10px pink; color: black; text-align: center; font-size: 18px; font-weight: bold;">
+        <img width="35" height="35" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/><font color="gray">Apple AI Lottery Game</font></header>
+     
+</div><br>
+<body style="margin:0; font-family: Arial, sans-serif; background: #111; color: #fff; text-align: center;">
+
+  <!-- Header -->
+  <header style="background: linear-gradient(90deg, #ff0057, #6a00ff); padding: 20px; font-size: 1.8em;">
+    Select game to play
+  </header></br>
+  <font color="yellow">User can only play one game </font></br>
+
+  <!-- Game Squares -->
+  <div style="display: flex; justify-content: center; align-items: center; flex-wrap: wrap; gap: 30px; padding: 40px;">
+
+    <!-- Game 1: Spinning -->
+    <a href="spinning_wheel.html" style="text-decoration: none; color: white;">
+      <div style="width: 40vw; max-width: 160px;">
+        <div style="width: 100%; height: 100%; aspect-ratio: 1; overflow: hidden; border: 4px solid #00f; animation: spin 5s linear infinite;">
+          <img src="img/spin.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <p style="margin-top: 10px; font-size: 1.1em;">Spinning</p>
+      </div>
+    </a>
+
+    <!-- Game 2: Quiz -->
+    <a href="quiz.html" style="text-decoration: none; color: white;">
+      <div style="width: 40vw; max-width: 160px;">
+        <div style="width: 100%; height: 100%; aspect-ratio: 1; overflow: hidden; border: 4px solid #0f0; animation: pulse 2s infinite;">
+          <img src="img/quiz.png" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <p style="margin-top: 10px; font-size: 1.1em;">Quiz</p>
+      </div>
+    </a>
+
+    <!-- Game 3: Tennis -->
+    <a href="tenis.html" style="text-decoration: none; color: white;">
+      <div style="width: 40vw; max-width: 160px;">
+        <div style="width: 100%; height: 100%; aspect-ratio: 1; overflow: hidden; border: 4px solid #ff0; animation: bounce 2s ease-in-out infinite;">
+          <img src="img/tenis.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <p style="margin-top: 10px; font-size: 1.1em;">Tennis</p>
+      </div>
+    </a>
+    
+        <!-- Game 4: scratch -->
+    <a href="scratch.html" style="text-decoration: none; color: white;">
+      <div style="width: 40vw; max-width: 160px;">
+        <div style="width: 100%; height: 100%; aspect-ratio: 1; overflow: hidden; border: 4px solid #0f0; animation: pulse 2s infinite;">
+          <img src="img/scratch.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <p style="margin-top: 10px; font-size: 1.1em;">Lucky scratch</p>
+      </div>
+    </a>
+    
+        <!-- Game 5: roulette -->
+    <a href="roulette.html" style="text-decoration: none; color: white;">
+      <div style="width: 40vw; max-width: 160px;">
+        <div style="width: 100%; height: 100%; aspect-ratio: 1; overflow: hidden; border: 4px solid #00f; animation: spin 5s linear infinite;">
+          <img src="img/roulette.jpeg" style="width: 100%; height: 100%; object-fit: cover;">
+        </div>
+        <p style="margin-top: 10px; font-size: 1.1em;">roulette wheel</p>
+      </div>
+    </a>
+
+  </div>
+
+<!-- Footer -->
+    <footer>
+         <img width="20" height="20" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/>  &copy; 2025 IA Lottery.| All Rights Reserved | Play Smart, Win Big! </p>
+    </footer>
+
+  <!-- Animations -->
+  <style>
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+    @keyframes pulse {
+      0%, 100% { transform: scale(1); }
+      50% { transform: scale(1.1); }
+    }
+    @keyframes bounce {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-20px); }
+    }
+  </style>
+
+</body>
+</html>

